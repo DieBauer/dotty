@@ -37,10 +37,13 @@ class BetaReduce extends MiniPhase:
 
   override def transformApply(app: Apply)(using ctx: Context): Tree = app.fun match
     case Select(fn, nme.apply) if defn.isFunctionType(fn.tpe) =>
+      System.out.println(s"BetaReducetransformApply: $app")
       val app1 = betaReduce(app, fn, app.args)
       if app1 ne app then ctx.log(i"beta reduce $app -> $app1")
       app1
     case _ =>
+      System.out.println(s"#############: $app")
+
       app
 
   private def betaReduce(tree: Apply, fn: Tree, args: List[Tree])(using ctx: Context): Tree =
@@ -76,5 +79,7 @@ object BetaReduce:
       substTo = argSyms
     ).transform(ddef.rhs)
 
-    seq(bindings.result(), expansion)
+    val t = seq(bindings.result(), expansion)
+    System.out.println(s"BetaReduce: $t")
+    t
   end apply

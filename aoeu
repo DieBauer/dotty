@@ -1,0 +1,12 @@
+ class A(a: String) extends B
+  (
+A#A$superArg$1(this.a)) {
+  private val a: String
+  private <static> def A$superArg$1(a: String): C =
+    {
+      final class $anon() extends Object(), C {
+        override def get(): String = A.this.a
+      }
+      new Object with C {...}():C
+    }
+}

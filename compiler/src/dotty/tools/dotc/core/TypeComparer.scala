@@ -293,6 +293,7 @@ class TypeComparer(initctx: Context) extends ConstraintHandling[AbsentContext] w
       case tp2: AnnotatedType if !tp2.isRefining =>
         recur(tp1, tp2.parent)
       case tp2: ThisType =>
+        System.out.println(s"firsttry: ThisType: $tp2")
         def compareThis = {
           val cls2 = tp2.cls
           tp1 match {
@@ -381,6 +382,7 @@ class TypeComparer(initctx: Context) extends ConstraintHandling[AbsentContext] w
           }
         compareTypeParamRef
       case tp1: ThisType =>
+        System.out.println(s"secondtry: ThisType: $tp1")
         val cls1 = tp1.cls
         tp2 match {
           case tp2: TermRef if cls1.is(Module) && cls1.eq(tp2.widen.typeSymbol) =>

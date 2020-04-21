@@ -157,8 +157,9 @@ class PostTyper extends MacroTransform with IdentityDenotTransformer { thisPhase
          && !ctx.reporter.errorsReported
           // don't check if errors were already reported; this avoids follow-on errors
           // for inferred types if explicit types are already ill-formed
-        => Checking.checkAppliedTypesIn(tree)
-      case _ =>
+        => System.out.println(s"checkInferredWellFormed zeroextent no errors: $tree")
+        Checking.checkAppliedTypesIn(tree)
+      case _ => System.out.println(s"checkInferredWellFormed: $tree")
 
     private def transformSelect(tree: Select, targs: List[Tree])(implicit ctx: Context): Tree = {
       val qual = tree.qualifier
@@ -219,7 +220,8 @@ class PostTyper extends MacroTransform with IdentityDenotTransformer { thisPhase
       }
     }
 
-    override def transform(tree: Tree)(implicit ctx: Context): Tree =
+    override def transform(tree: Tree)(implicit ctx: Context): Tree = {
+      System.out.println(s"Transform: ${tree.show}")
       try tree match {
         case tree: Ident if !tree.isType =>
           tree.tpe match {
@@ -377,6 +379,7 @@ class PostTyper extends MacroTransform with IdentityDenotTransformer { thisPhase
           println(i"error while transforming $tree")
           throw ex
       }
+    }
 
     /** Transforms the rhs tree into a its default tree if it is in an `erased` val/def.
      *  Performed to shrink the tree that is known to be erased later.

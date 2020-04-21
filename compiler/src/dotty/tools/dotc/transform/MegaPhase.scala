@@ -555,6 +555,7 @@ class MegaPhase(val miniPhases: Array[MiniPhase]) extends Phase {
   }
 
   def prepSelect(tree: Select, start: Int)(implicit ctx: Context): Context = {
+    System.out.println(s"prepselect $tree at $start")
     val phase = nxSelectPrepPhase(start)
     if (phase == null) ctx
     else prepSelect(tree, phase.idxInGroup + 1)(phase.prepareForSelect(tree))

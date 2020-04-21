@@ -79,6 +79,7 @@ class TreeTypeMap(
   override def transform(tree: tpd.Tree)(implicit ctx: Context): tpd.Tree = treeMap(tree) match {
     case impl @ Template(constr, parents, self, _) =>
       val tmap = withMappedSyms(localSyms(impl :: self :: Nil))
+      System.out.println(s"TreeTypeMap.transform Template: $tmap")
       cpy.Template(impl)(
           constr = tmap.transformSub(constr),
           parents = parents.mapconserve(transform),
@@ -89,8 +90,11 @@ class TreeTypeMap(
     case tree1 =>
       tree1.withType(mapType(tree1.tpe)) match {
         case id: Ident if tpd.needsSelect(id.tpe) =>
+          System.out.println(s"TreeTypeMap.transform Ident: $id")
           ref(id.tpe.asInstanceOf[TermRef]).withSpan(id.span)
         case ddef @ DefDef(name, tparams, vparamss, tpt, _) =>
+          System.out.println(s"TreeTypeMap.transform DefDef: $ddef")
+          //TODO hier naar kijken! 
           val (tmap1, tparams1) = transformDefs(ddef.tparams)
           val (tmap2, vparamss1) = tmap1.transformVParamss(vparamss)
           val res = cpy.DefDef(ddef)(name, tparams1, vparamss1, tmap2.transform(tpt), tmap2.transform(ddef.rhs))
@@ -152,6 +156,7 @@ class TreeTypeMap(
 
   /** The current tree map composed with a substitution [from -> to] */
   def withSubstitution(from: List[Symbol], to: List[Symbol]): TreeTypeMap =
+
     if (from eq to) this
     else {
       // assert that substitution stays idempotent, assuming its parts are
@@ -184,6 +189,8 @@ class TreeTypeMap(
    *  and substitutes their declarations.
    */
   def withMappedSyms(syms: List[Symbol], mapped: List[Symbol]): TreeTypeMap = {
+    System.out.println(s"TreeTypeMap.withMappedSyms: $syms, $mapped")
+
     val symsChanged = syms ne mapped
     val substMap = withSubstitution(syms, mapped)
     val fullMap = mapped.filter(_.isClass).foldLeft(substMap) { (tmap, cls) =>
